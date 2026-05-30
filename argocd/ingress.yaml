@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server
+  namespace: argocd
+  annotations:
+    # Pass TLS connections directly to the backend without terminating SSL at the ingress
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # Tell nginx the upstream service speaks HTTPS (required when ssl-passthrough is true)
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  # Use the nginx IngressClass to handle this resource
+  ingressClassName: nginx
+  rules:
+    - host: argocd.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443
